@@ -68,6 +68,7 @@ async function addConstantMarginToMap(baseMarginToAdd, partyToShift, partyToTake
         {
           regionData.margin *= -1
           regionData.partyID = partyToShift.getID()
+          regionData.candidateName = regionData.candidateMap?.[regionData.partyID] ?? politicalParties[regionData.partyID].getCandidateName()
           regionData.flip = false
         }
       }

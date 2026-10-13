@@ -6,7 +6,7 @@ const elections=JSON.parse(fs.readFileSync('csv-sources/uk-general-elections.jso
  const browser=await chromium.launch({channel:'msedge',headless:true});
  const context=await browser.newContext({viewport:{width:1440,height:1000}});
  const page=await context.newPage();
- const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const errors=[];page.on('pageerror',e=>errors.push(e.stack));
  await page.goto('http://127.0.0.1:8765');
  await page.waitForFunction(()=>typeof currentMapCountry!=='undefined' && currentMapCountry && document.querySelector('#outlines'));
  await page.locator('#cycleMapCountryButton').click();
@@ -47,7 +47,7 @@ const elections=JSON.parse(fs.readFileSync('csv-sources/uk-general-elections.jso
  await page.locator('#dataMapDateSlider').fill('1');await page.waitForFunction(()=>currentSliderDate?.getFullYear()===1997&&!isRunningDisplayMapQueue);
  await page.locator('body').click({position:{x:10,y:750}});await page.keyboard.press('ArrowRight');await page.waitForFunction(()=>currentSliderDate?.getFullYear()===2001);
  const mobile=await page.context().newPage();
- mobile.on('pageerror',e=>errors.push(e.message));
+ mobile.on('pageerror',e=>errors.push(e.stack));
  await mobile.setViewportSize({width:390,height:844});
  await mobile.goto('http://127.0.0.1:8765');
  await mobile.waitForFunction(()=>currentMapCountry.getID()==='UK'&&currentSliderDate?.getFullYear()===2024&&!isRunningDisplayMapQueue);

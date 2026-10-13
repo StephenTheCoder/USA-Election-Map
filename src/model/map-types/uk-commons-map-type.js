@@ -134,7 +134,7 @@ function serializeUKCustomMap(mapData)
         region.candidateName = region.partyID == TossupParty.getID() ? null : sorted[0].candidate
         region.margin = (sorted[0]?.voteshare ?? 0)-(sorted[1]?.voteshare ?? 0)
       }
-      region.ukSharesSnapshot = shares.map(v => ({candidate: v.candidate, partyID: v.partyID, voteshare: v.voteshare}))
+      if (shares.length) region.ukSharesSnapshot = shares.map(v => ({candidate: v.candidate, partyID: v.partyID, voteshare: v.voteshare}))
       // Historical counts no longer describe a user-edited percentage scenario.
       const changedVotes = changedShares || (region.totalVotes > 0 && shares.some(v => v.votes != null && Math.abs(v.votes/region.totalVotes*100-v.voteshare) > 1e-7))
       if (changedVotes)
@@ -194,7 +194,7 @@ function organizeUKCustomMap(rawData, dates)
       UKRegionNames[id] = escapeUKElectionText(rows[0].name || id)
       const winner = metadata.partyID ?? shares[0]?.partyID ?? TossupParty.getID()
       const candidateMap = Object.fromEntries(shares.map(v => [v.partyID, v.candidate]))
-      const candidateName = metadata.candidateName != null ? escapeUKElectionText(metadata.candidateName) : shares[0]?.candidate
+      const candidateName = Object.hasOwn(metadata, "candidateName") ? (metadata.candidateName == null ? null : escapeUKElectionText(metadata.candidateName)) : shares[0]?.candidate
       if (candidateName) candidateMap[winner] = candidateName
       mapData[date][id] = {
         ...metadata, name: UKRegionNames[id], region: id, boundaryYear: Number(rows[0].boundary || metadata.boundaryYear || 2024),
@@ -215,7 +215,9 @@ function organizeUKCustomMap(rawData, dates)
 
 function getUKCustomSVG(date)
 {
-  const regions = this.mapData?.[date.getTime()] ?? {}
+  // Comparison records use today's model date, while the shared renderer
+  // requests geometry using the first comparison election's date.
+  const regions = this.mapData?.[date.getTime()] ?? Object.values(this.mapData ?? {}).at(-1) ?? {}
   const boundaryYear = Object.values(regions).find(r => r.boundaryYear)?.boundaryYear ?? 2024
   const path = `svg-sources/uk-commons-${boundaryYear}-map.svg`
   return currentViewingState == ViewingState.zooming ? [path, null] : path
@@ -291,12 +293,18 @@ async function createUKComparisonData(original)
     changes.forEach((v, i) => v.order = i)
     const normalizeLeader = (region, shares) => {
       const sorted = Object.entries(shares).sort((x, y) => y[1]-x[1])
-      return {party: region.partyID ?? sorted[0]?.[0] ?? TossupParty.getID(),
+      return {party: region.partyID == "UK-P153" ? "UK-RUK" : region.partyID ?? sorted[0]?.[0] ?? TossupParty.getID(),
         margin: region.margin ?? (sorted[0]?.[1] ?? 0)-(sorted[1]?.[1] ?? 0)}
     }
     const leaders = [normalizeLeader(a, grouped[0]), normalizeLeader(b, grouped[1])]
     const movement = leaders[0].margin+(leaders[0].party == leaders[1].party ? -leaders[1].margin : leaders[1].margin)
-    const opponent = (a.partyVotesharePercentages ?? []).find(v => v.partyID != leaders[0].party)?.partyID
+    const candidates = a.partyVotesharePercentages ?? a.ukSharesSnapshot ?? []
+    const winner = candidates.find(v => v.candidate == a.candidateName) ?? candidates.find(v => (v.partyID == "UK-P153" ? "UK-RUK" : v.partyID) == leaders[0].party)
+    const runnerShare = (winner?.voteshare ?? NaN)-leaders[0].margin
+    // Match the published runner-up share before considering a combined Other
+    // row, which may contain more than one candidate in the early datasets.
+    const runner = candidates.find(v => v != winner && Math.abs(v.voteshare-runnerShare) < 1e-7)
+    const opponent = runner?.partyID ?? (a.aggregate && a.partyVotesharePercentages ? "UK-OTH" : candidates.find(v => v.partyID != leaders[0].party)?.partyID)
     result[id] = {region: id, name: base.name, boundaryYear: boundary, comparison: true,
       comparisonNote: notes.join("; "), partyID: Math.abs(movement) < 1e-9 ? TossupParty.getID() : movement < 0 ? (opponent ?? leaders[1].party) : leaders[0].party,
       candidateName: null, margin: Math.abs(movement), partyVotesharePercentages: a.partyVotesharePercentages && b.partyVotesharePercentages ? changes : undefined}

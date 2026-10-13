@@ -568,16 +568,19 @@ function addDivEventListeners()
   })
 
   $("#regionboxcontainer").on('show', function() {
+    clearTimeout($(this).data('hideTimer'))
     $(this).show()
     $(this).css('opacity', "1")
   })
 
   $("#regionboxcontainer").on('hide', function() {
+    clearTimeout($(this).data('hideTimer'))
     $(this).css('opacity', "0")
 
-    setTimeout(function() {
-      if ($("#regionboxcontainer").css('opacity') == "0") { $("#regionboxcontainer").hide() }
-    }, 200)
+    $(this).data('hideTimer', setTimeout(() => {
+      // Read the requested opacity, rather than a transitional computed value.
+      if (this.style.opacity == "0") { $(this).hide() }
+    }, 200))
   })
 
   $("#charttooltipcontainer").on('show', function() {
@@ -707,6 +710,8 @@ async function setMapSource(mapSource, ...loadDataMapArgs)
 
 async function loadDataMap(shouldSetToMax, forceDownload, previousDateOverride, resetCandidateNames, reloadPartyDropdowns)
 {
+  const sourceToLoad = currentMapSource
+  const typeToLoad = currentMapType
   $("#sliderDateDisplayContainer").css('visibility', 'hidden')
 
   if (selectedDropdownDivID != "mapSourcesDropdownContent")
@@ -746,6 +751,12 @@ async function loadDataMap(shouldSetToMax, forceDownload, previousDateOverride, 
 
   let iconDivDictionary = getIconDivsToUpdateArrayForSourceID(currentMapSource.getID())
   let loadedSuccessfully = await downloadDataForMapSource(currentMapSource.getID(), iconDivDictionary, null, forceDownload, null, null, resetCandidateNames)
+
+  if (currentMapSource != sourceToLoad || currentMapType != typeToLoad)
+  {
+    removeLoader(LoaderType.standard)
+    return
+  }
 
   if (!loadedSuccessfully)
   {
@@ -951,6 +962,10 @@ async function displayDataMap(dateIndex, reloadPartyDropdowns, fadeForNewSVG)
 {
   if (!currentMapSource) return
 
+  const sourceToDisplay = currentMapSource
+  const typeToDisplay = currentMapType
+  const displayWasReplaced = () => currentMapSource != sourceToDisplay || currentMapType != typeToDisplay
+
   dateIndex = dateIndex || $("#dataMapDateSlider").val()
 
   let mapDates = currentMapSource.getMapDates()
@@ -970,6 +985,7 @@ async function displayDataMap(dateIndex, reloadPartyDropdowns, fadeForNewSVG)
   let shouldReloadSVG = false
   let currentSVGPath = currentMapType.getSVGPath()
   let newOverrideSVGPath = await currentMapSource.getOverrideSVGPath(showingCompareMap && currentMapSource.isCompare() ? currentCompareSliderDate : dateToDisplay)
+  if (displayWasReplaced()) return
 
   if (newOverrideSVGPath != null && JSON.stringify(currentSVGPath) != JSON.stringify(newOverrideSVGPath))
   {
@@ -989,6 +1005,7 @@ async function displayDataMap(dateIndex, reloadPartyDropdowns, fadeForNewSVG)
       cachedSVGPathData = svgPath
       resolve()
     }, fadeForNewSVG)
+    if (displayWasReplaced()) return
   }
   let svgPathData = currentMapType.getSVGPath()
   let usedFallbackMap = svgPathData[2] || false
@@ -999,6 +1016,7 @@ async function displayDataMap(dateIndex, reloadPartyDropdowns, fadeForNewSVG)
   if (currentViewingState == ViewingState.zooming && !currentMapSource.zoomingDataFunction)
   {
     await zoomOutMap(false)
+    if (displayWasReplaced()) return
   }
 
   switch (currentViewingState)
@@ -1016,7 +1034,7 @@ async function displayDataMap(dateIndex, reloadPartyDropdowns, fadeForNewSVG)
     break
   }
 
-  if (currentDisplayDate.getTime() != dateToDisplay.getTime())
+  if (displayWasReplaced() || currentDisplayDate?.getTime() != dateToDisplay.getTime())
   {
     // console.log(currentDisplayDate.getFullYear(), dateToDisplay.getFullYear())
     return
@@ -1026,6 +1044,7 @@ async function displayDataMap(dateIndex, reloadPartyDropdowns, fadeForNewSVG)
     if (cachedSVGPathData instanceof Array)
     {
       await handleSVGZooming(() => {}, cachedSVGPathData, handleNewSVGFields, fadeForNewSVG, currentViewingState == ViewingState.zooming)
+      if (displayWasReplaced()) return
     }
     else
     {

@@ -313,7 +313,8 @@ class MapSource
   setTextMapData(textData, self)
   {
     self = self || this
-    this.textMapData = textData
+    self.textMapData = textData
+    self.rawMapData = null
   }
 
   getTextMapData()
