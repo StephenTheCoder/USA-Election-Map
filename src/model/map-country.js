@@ -292,10 +292,20 @@ function setMapCountries()
     "May 2026 Midterm Elections": {time: 1780182000000, url: null}
   })
   
+  UKMapCountry.setMapTypes({[UKCommonsMapType.getID()]: UKCommonsMapType})
+  UKMapCountry.setPoliticalPartyData(
+    UKPoliticalParties,
+    ["UK-LAB", "UK-CON", "UK-LD", "UK-SNP", "UK-GREEN", "UK-RUK"],
+    Object.keys(UKPoliticalParties),
+    []
+  )
+  UKMapCountry.setCountdownTimes({})
+
+  mapCountries[UKMapCountry.getID()] = UKMapCountry
   mapCountries[USAMapCountry.getID()] = USAMapCountry
   mapCountries[JJUMapCountry.getID()] = JJUMapCountry
 
-  mapCountryIDs = [USAMapCountry.getID(), JJUMapCountry.getID()]
+  mapCountryIDs = [USAMapCountry.getID(), UKMapCountry.getID(), JJUMapCountry.getID()]
 }
 
 let USAMapCountry = new MapCountry(
@@ -311,3 +321,5 @@ let JJUMapCountry = new MapCountry(
   "JJU",
   "assets/jju-flag-10.png"
 )
+
+let UKMapCountry = new MapCountry("UK", "United Kingdom", "UK", "assets/uk-flag.svg")

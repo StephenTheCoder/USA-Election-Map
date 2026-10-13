@@ -1,0 +1,61 @@
+const {chromium}=require('../.tools/node_modules/playwright');
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const elections=JSON.parse(fs.readFileSync('csv-sources/uk-general-elections.json','utf8')).elections;
+(async()=>{
+ const browser=await chromium.launch({channel:'msedge',headless:true});
+ const context=await browser.newContext({viewport:{width:1440,height:1000}});
+ const page=await context.newPage();
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('http://127.0.0.1:8765');
+ await page.waitForFunction(()=>typeof currentMapCountry!=='undefined' && currentMapCountry && document.querySelector('#outlines'));
+ await page.locator('#cycleMapCountryButton').click();
+ await page.waitForFunction(()=>currentMapCountry.getID()==='UK'&&currentSliderDate?.getFullYear()===2024&&Object.keys(displayRegionDataArray).length===651);
+ for(let i=0;i<elections.length;i++){
+  const e=elections[i];
+  await page.locator('#dataMapDateSlider').fill(String(i+1));
+  await page.waitForFunction(y=>currentSliderDate?.getFullYear()===y&&currentDisplayDate?.getFullYear()===y&&!isRunningDisplayMapQueue,e.year);
+  const result=await page.evaluate(()=>({outlines:document.querySelector('#outlines').children.length,totals:getPartyTotals(false),npv:displayRegionDataArray.NPV,total:displayRegionDataArray.NPV?.totalVotes,year:currentSliderDate.getFullYear(),missing:[...document.querySelector('#outlines').children].filter(el=>!displayRegionDataArray[el.id]).map(el=>el.id),neutral:[...document.querySelector('#outlines').children].filter(el=>el.style.fill===defaultRegionFillColor).map(el=>el.id)}));
+  assert.equal(result.outlines,e.regions.length);assert.deepEqual(result.missing,[]);assert.deepEqual(result.neutral,[]);assert.equal(result.total,e.totalVotes);
+  for(const [id,n] of Object.entries(e.seats))assert.equal(result.totals[id],n,`${e.year} ${id}`);
+  assert.equal(Object.values(result.totals).reduce((a,b)=>a+b,0),e.regions.length);
+  console.log('PASS',e.year,e.regions.length,'coloured constituencies and matching seat/vote totals');
+  if(e.year===1997||e.year===2005)await page.screenshot({path:`.tools/uk-${e.year}.png`});
+ }
+ const first=elections[7].regions.find(r=>r.name==='Chorley');
+ const region=page.locator(`[id="${first.id}"]`);
+ const point=await region.evaluate(el=>{
+  const r=el.getBoundingClientRect();
+  for(let y=Math.ceil(r.top);y<r.bottom;y+=2)for(let x=Math.ceil(r.left);x<r.right;x+=2)
+   if(document.elementFromPoint(x,y)===el)return{x,y};
+  throw Error('No visible constituency hit point');
+ });
+ await page.mouse.move(point.x,point.y);
+ await page.waitForFunction(()=>document.querySelector('#regionbox').textContent.includes('Lindsay'));
+ assert.match(await page.locator('#regionbox').textContent(),/Lindsay Hoyle/);
+ await page.keyboard.down('Shift');assert.match(await page.locator('#regionbox').textContent(),/25,238/);await page.keyboard.up('Shift');
+ await page.mouse.click(point.x,point.y);await page.waitForFunction(()=>currentViewingState===ViewingState.zooming&&svgPanZoomController);
+ await page.locator('#mapZoomInButton').click();
+ assert.ok(await page.evaluate(()=>svgPanZoomController.getZoom()>1));
+ await page.locator('#mapCloseButton').click();await page.waitForFunction(()=>currentViewingState===ViewingState.viewing);
+ await page.locator('#cycleMapCountryButton').click();await page.waitForFunction(()=>currentMapCountry.getID()==='JJU'&&currentMapType.getID()==='JJU-House');
+ await page.locator('#cycleMapCountryButton').click();await page.waitForFunction(()=>currentMapCountry.getID()==='USA'&&currentMapType.getID().startsWith('USA')&&document.querySelector('[aria-label="Switch to United Kingdom"]'));
+ await page.locator('#cycleMapCountryButton').hover();await page.locator('[aria-label="Switch to United Kingdom"]').click();
+ await page.waitForFunction(()=>currentMapCountry.getID()==='UK'&&currentSliderDate?.getFullYear()===2024);
+ await page.reload();await page.waitForFunction(()=>currentMapCountry.getID()==='UK'&&currentSliderDate?.getFullYear()===2024);
+ assert.equal(await page.locator('#cycleMapCountryButton img').getAttribute('src'),'assets/uk-flag.svg');
+ await page.locator('#dataMapDateSlider').fill('1');await page.waitForFunction(()=>currentSliderDate?.getFullYear()===1997&&!isRunningDisplayMapQueue);
+ await page.locator('body').click({position:{x:10,y:750}});await page.keyboard.press('ArrowRight');await page.waitForFunction(()=>currentSliderDate?.getFullYear()===2001);
+ const mobile=await page.context().newPage();
+ mobile.on('pageerror',e=>errors.push(e.message));
+ await mobile.setViewportSize({width:390,height:844});
+ await mobile.goto('http://127.0.0.1:8765');
+ await mobile.waitForFunction(()=>currentMapCountry.getID()==='UK'&&currentSliderDate?.getFullYear()===2024&&!isRunningDisplayMapQueue);
+ await mobile.waitForTimeout(1200);
+ assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+ await mobile.screenshot({path:'.tools/uk-mobile.png',fullPage:true});
+ assert.equal(await page.evaluate(()=>document.querySelector('#countdownDisplay').textContent),'');
+ assert.deepEqual(errors,[]);
+ console.log('PASS hover votes, zoom, all flag routes, persistence, keyboard slider and mobile rendering; no runtime errors');
+ await browser.close();
+})().catch(e=>{console.error(e);process.exit(1)});

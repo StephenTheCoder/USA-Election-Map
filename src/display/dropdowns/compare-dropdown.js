@@ -147,7 +147,7 @@ async function hideCustomCompareSelection(shouldReset)
     toggleMapSettingDisable("seatArrangement", true)
     updateCompareMapSlidersVisibility()
     
-    setCompareSliderDates()
+    await setCompareSliderDates()
   }
   else
   {
@@ -195,15 +195,16 @@ async function loadComparePreset(comparePresetNum)
     await addCompareMapSource(defaultCompareSourceIDs[comparePresetNum][1])
   }
 
-  setCompareSliderDates()
+  await setCompareSliderDates()
 }
 
-function setCompareSliderDates()
+async function setCompareSliderDates()
 {
   if (compareMapSourceIDArray[0] == compareMapSourceIDArray[1])
   {
-    $("#secondCompareDataMapDateSlider").val(mapSources[compareMapSourceIDArray[1]].getMapDates().length-1)
-    setCompareSourceDate(1, mapSources[compareMapSourceIDArray[1]].getMapDates().length-1)
+    const index = Math.max(1, mapSources[compareMapSourceIDArray[1]].getMapDates().length-1)
+    $("#secondCompareDataMapDateSlider").val(index)
+    await setCompareSourceDate(1, index)
   }
 }
 
@@ -446,7 +447,24 @@ async function setCompareSourceDate(compareArrayIndex, dateIndex, shouldApply = 
 
 async function applyCompareToCustomMap(shouldResetRound = false)
 {
-  if (compareMapDataArray.length < 2 || compareMapDataArray[0] == null || compareMapDataArray[1] == null) { return }
+  if (compareMapDataArray.length < 2 || compareMapDataArray[0] == null || compareMapDataArray[1] == null)
+  {
+    return await currentMapType.startDefaultCompare?.()
+  }
+
+  const comparisonSource = currentCompareMapSource ?? currentCustomMapSource
+  if (comparisonSource.createComparisonData)
+  {
+    const mapType = currentMapType
+    const results = await comparisonSource.createComparisonData(compareMapDataArray)
+    if (currentMapType != mapType) return
+    currentRound = null
+    compareRoundsForDates = [[], []]
+    comparisonSource.updateMapData(results, new Date(getTodayString("/", false, "mdy")).getTime(), true,
+      mapSources[compareMapSourceIDArray[0]].getCandidateNames(currentCompareSliderDate.getTime()), EditingMode.voteshare)
+    if (shouldSetCompareMapSource) await setMapSource(comparisonSource)
+    return
+  }
 
   let voteshareCutoffMargin0 = mapSources[compareMapSourceIDArray[0]].voteshareCutoffMargin
   let voteshareCutoffMargin1 = mapSources[compareMapSourceIDArray[1]].voteshareCutoffMargin

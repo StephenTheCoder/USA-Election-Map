@@ -1,0 +1,54 @@
+{
+  "retrieved": "2026-10-13",
+  "inputs": {
+    "commons-2024-constituencies.csv": {
+      "url": "https://researchbriefings.files.parliament.uk/documents/CBP-10009/HoC-GE2024-results-by-constituency.csv",
+      "sha256": "71533da2e4746c996350211c280be8b934d16485d33e5996271512f676b19590"
+    },
+    "commons-2024-candidates.csv": {
+      "url": "https://researchbriefings.files.parliament.uk/documents/CBP-10009/HoC-GE2024-results-by-candidate.csv",
+      "sha256": "040939fc0e96bde91b7b534db43b7c90e35ec2207b6ab3fdb2456d0acb43bb08"
+    },
+    "commons-1918-2019.xlsx": {
+      "url": "https://researchbriefings.files.parliament.uk/documents/CBP-8647/1918-2019election_results_by_pcon.xlsx",
+      "sha256": "82d5657f38f1e331911d0e8ae68112040ea54d073516c246bc917c7ff80d0f2e"
+    },
+    "psephology.db": {
+      "url": "https://raw.githubusercontent.com/ukparliament/psephology-datasette/main/psephology.db",
+      "sha256": "93f784bbe072f8c1a771a353eaa39d0e691945a74af5f74e60db3a491277161f"
+    },
+    "commons-1997.pdf": {
+      "url": "https://researchbriefings.files.parliament.uk/documents/RP01-38/RP01-38.pdf",
+      "sha256": "3db204d87cde565d03b4baf3dfcd1dc345e77dcfb299e791f91d8b895e8e20cb"
+    },
+    "map-1997.svg": {
+      "url": "https://raw.githubusercontent.com/yapms/yapms/main/apps/yapms/src/lib/assets/maps/gbr/gbr-commons-1997121-results.svg",
+      "sha256": "4f46e92a6ac6949320c9cabe9dc989b464f21b3f1cd17e20eb479198b4bab301"
+    },
+    "ni1997.geojson": {
+      "url": "https://umap.openstreetmap.fr/en/datalayer/919580/e0482a2c-76f0-40a5-8ce8-a4648d50e7d5/",
+      "sha256": "7806fd43c01950936fcb6440ad75b7d15753e6c29f0dfecda35c3561e22421f5"
+    },
+    "commons-2001.pdf": {
+      "url": "https://researchbriefings.files.parliament.uk/documents/RP01-54/RP01-54.pdf",
+      "sha256": "8d69234c12a31ebe168c24ea7c38ea502924d48d32c8591dfe152df5bbff6c0f"
+    },
+    "commons-2005.pdf": {
+      "url": "https://researchbriefings.files.parliament.uk/documents/RP05-33/RP05-33.pdf",
+      "sha256": "271b75718cbc253f00b36531972e8030a5d89962ce19f3d69332f634bd0dc771"
+    },
+    "map-2005.svg": {
+      "url": "https://raw.githubusercontent.com/yapms/yapms/main/apps/yapms/src/lib/assets/maps/gbr/gbr-commons-2005125-results.svg",
+      "sha256": "93d1563ed3201ce805ccb973a8fec532b1c32cb91651818ed2f52df418191345"
+    },
+    "map-2010.svg": {
+      "url": "https://raw.githubusercontent.com/yapms/yapms/main/apps/yapms/src/lib/assets/maps/gbr/gbr-commons-2010126-results.svg",
+      "sha256": "5650f6c2906e9b047701c3fc3104b986be0f6b03b265a62a26cd88dd138bae12"
+    },
+    "map-2024.svg": {
+      "url": "https://raw.githubusercontent.com/yapms/yapms/main/apps/yapms/src/lib/assets/maps/gbr/gbr-commons-2024-blank.svg",
+      "sha256": "07b20abf4839397c55a2c863f8582ea69bc5a115696256ec04c7a5613a6a004f"
+    }
+  },
+  "pollDateCorrectionSource": "https://publications.parliament.uk/pa/cm201011/cmwib/wb100529/notifi.htm"
+}

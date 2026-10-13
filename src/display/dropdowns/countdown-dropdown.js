@@ -38,6 +38,12 @@ function selectCountdownTime(countdownTimeName, countdownButtonDiv)
 
 function updateCountdownTimer()
 {
+  if (Object.keys(countdownTimes).length == 0)
+  {
+    $("#countdownDisplay").empty().removeAttr('href')
+    currentCountdownTimeName = null
+    return
+  }
   let currentDate = new Date()
 
   let countdownTime

@@ -4,5 +4,6 @@ assets/niu
 .eslintrc
 csv-helper
 .nova
+.tools/
 image-parsing/*
 !image-parsing/*.js

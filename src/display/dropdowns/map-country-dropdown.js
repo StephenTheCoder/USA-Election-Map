@@ -12,8 +12,8 @@ function createMapCountryDropdownItems()
 
 	let mapCountry = mapCountries[country]
 
-	let divStringToAppend = "<a onclick='setMapCountry(\"" + country + "\")' style='display: flex; padding: 0; margin-top: 0;'>"
-	divStringToAppend += "<img src='" + mapCountry.getIconURL() + "' style='width: 43px; height: 43px; padding: 3px;'/>"
+	let divStringToAppend = "<a onclick='setMapCountry(\"" + country + "\")' title='" + mapCountry.getName() + "' aria-label='Switch to " + mapCountry.getName() + "' style='display: flex; padding: 0; margin-top: 0;'>"
+	divStringToAppend += "<img src='" + mapCountry.getIconURL() + "' alt='" + mapCountry.getName() + "' style='width: 43px; height: 43px; padding: 3px;'/>"
 	divStringToAppend += "</a>"
 
 	$("#mapCountryDropdownContainer").append(divStringToAppend)
@@ -37,6 +37,8 @@ async function setMapCountry(newMapCountryID, buttonDiv, loadMapType)
   setCookie("currentMapCountry", currentMapCountry.getID())
 
   $(buttonDiv || "#cycleMapCountryButton").find("img").attr('src', currentMapCountry.getIconURL())
+  $(buttonDiv || "#cycleMapCountryButton").attr('title', currentMapCountry.getName()).attr('aria-label', 'Current country: ' + currentMapCountry.getName())
+  $(buttonDiv || "#cycleMapCountryButton").find("img").attr('alt', currentMapCountry.getName())
 
   await reloadForNewMapCountry(false, loadMapType)
 }

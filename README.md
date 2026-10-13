@@ -6,6 +6,7 @@ An interactive USA presidential, senate, house, and governor election map. Creat
 
 * Interactive and detailed map sources
   * Past results for presidential (1788-2024, counties for 1892-2024), senatorial (1960-2024), house (1976-2024), and gubernatorial (1980-2024) elections, with victory margin and voteshare breakdowns for each state & district
+  * UK general election results for every election from 1997 to 2024, accessible through the flag selector, with historical constituency boundaries, seat totals and vote breakdowns. See [UK data sources and methodology](csv-sources/UK-DATA.md).
   * Pie chart for electoral vote counts by party and margin, national popular vote totals for past elections
   * Flip states and counties between election cycles
   * Fully editable custom maps that can be downloaded and uploaded as JSON or CSV files

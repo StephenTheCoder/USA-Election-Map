@@ -1,3 +1,13 @@
+function getRegionVoteshareInputID(candidateName)
+{
+  return "regionVoteshare-" + Array.from(String(candidateName), ch => ch.codePointAt(0).toString(16)).join("_")
+}
+
+function escapeRegionBoxAttribute(value)
+{
+  return String(value).replaceAll("&", "&amp;").replaceAll("'", "&#39;").replaceAll('"', "&quot;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+}
+
 async function updateRegionBox(regionID = currentRegionID)
 {
   let currentMapDataForDate = currentSliderDate && currentMapSource.getMapData() ? currentMapSource.getMapData()[currentSliderDate.getTime()] : null
@@ -94,7 +104,7 @@ async function updateRegionBox(regionID = currentRegionID)
     regionData.partyVotesharePercentages.forEach((candidateData, candidateOn) => {
       let candidateName = getRegionCandidateName(candidateData.partyID, regionData, candidateData)
       regionBoxHTML += "<div style='display: flex; justify-content: space-between; align-items: center; padding: 1px 4px; margin: 2px 0px; border-radius: " + (candidateOn == 0 ? "3px 3px" : "0px 0px") + (candidateOn == regionData.partyVotesharePercentages.length-1 ? " 3px 3px" : " 0px 0px") + "; background: " + getGradientCSS(politicalParties[candidateData.partyID].getMarginColors().safe, politicalParties[candidateData.partyID].getMarginColors().lean, candidateData.voteshare) + ";'><span style='margin-right: 5px;'>" + candidateName + "</span>"
-      regionBoxHTML += "<span><input id='regionVoteshare-" + candidateName.replaceAll(/[\s\.]/g, "_") + "' class='textInput' style='float: none; position: inherit; min-width: 40px; max-height: 20px; font-size: 17px' type='text' oninput='applyRegionVotesharePercentage(this, \"" + regionID + "\")' onclick='this.select()' onselect='selectedVoteshareCandidate = $(this).data(\"candidate\")' value='" + candidateData.voteshare + "' data-candidate='" + candidateName + "'>" + currentMapSource.getVoteshareSuffix(regionData) + "</span>"
+      regionBoxHTML += "<span><input id='" + getRegionVoteshareInputID(candidateName) + "' class='textInput' style='float: none; position: inherit; min-width: 40px; max-height: 20px; font-size: 17px' type='text' oninput='applyRegionVotesharePercentage(this, \"" + regionID + "\")' onclick='this.select()' onselect='selectedVoteshareCandidate = $(this).data(\"candidate\")' value='" + candidateData.voteshare + "' data-candidate='" + escapeRegionBoxAttribute(candidateName) + "'>" + currentMapSource.getVoteshareSuffix(regionData) + "</span>"
       regionBoxHTML += "</div>"
     })
     regionBoxHTML += "</div>"
@@ -108,7 +118,7 @@ async function updateRegionBox(regionID = currentRegionID)
 
     if (candidateDataToSelect)
     {
-      $("#regionVoteshare-" + getRegionCandidateName(candidateDataToSelect.partyID, regionData).replaceAll(/[\s\.]/g, "_")).select()
+      $("#" + getRegionVoteshareInputID(getRegionCandidateName(candidateDataToSelect.partyID, regionData, candidateDataToSelect))).select()
     }
 
     return
@@ -515,6 +525,7 @@ function applyRegionVotesharePercentage(textBoxDiv, regionID)
     partyVotesharePercentages.sort((voteshareData1, voteshareData2) => voteshareData2.voteshare-voteshareData1.voteshare)
     regionData.margin = partyVotesharePercentages.length < 2 ? partyVotesharePercentages[0].voteshare : partyVotesharePercentages[0].voteshare-partyVotesharePercentages[1].voteshare
     regionData.partyID = partyVotesharePercentages.some(voteshareData => voteshareData.voteshare != 0) ? partyVotesharePercentages[0].partyID : TossupParty.getID()
+    regionData.candidateName = regionData.partyID == TossupParty.getID() ? null : partyVotesharePercentages[0].candidate
 
     $(textBoxDiv).parent().parent().css("background", getGradientCSS(politicalParties[currentVoteshareData.partyID].getMarginColors().safe, politicalParties[currentVoteshareData.partyID].getMarginColors().lean, currentVoteshareData.voteshare))
 
@@ -547,7 +558,7 @@ function cycleSelectedRegionVoteshare(directionToCycle)
   const selectedVoteshareData = regionData.partyVotesharePercentages[voteshareIndex]
   const selectedVoteshareDataCandidate = getRegionCandidateName(selectedVoteshareData.partyID, regionData, selectedVoteshareData)
 
-  $("#regionVoteshare-" + selectedVoteshareDataCandidate.replaceAll(/[\s\.]/g, "_")).select()
+  $("#" + getRegionVoteshareInputID(selectedVoteshareDataCandidate)).select()
 }
 
 function closeRegionVoteshareEditing(regionID)

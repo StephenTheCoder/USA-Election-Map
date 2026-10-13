@@ -1,0 +1,10 @@
+{
+  "database": {
+    "url": "https://raw.githubusercontent.com/ukparliament/psephology-datasette/main/psephology.db",
+    "sha256": "93f784bbe072f8c1a771a353eaa39d0e691945a74af5f74e60db3a491277161f"
+  },
+  "sources": [
+    "https://electionresults.parliament.uk/general-elections/7",
+    "https://electionresults.parliament.uk/general-elections/5"
+  ]
+}
