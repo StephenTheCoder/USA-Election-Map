@@ -1,0 +1,25 @@
+{
+  "1952-bargarh-winner": {
+    "year": 1952,
+    "state": "Orissa",
+    "constituency": "BARGARH",
+    "party": "IND",
+    "candidate": "GHANSHYAM DAS THIRANI",
+    "votes": 27461,
+    "winner": true,
+    "source": "https://eparlib.sansad.in/bitstream/123456789/894287/1/01_I_13-05-1952_p13_p21_PII.pdf",
+    "note": "The Lok Sabha's Members Sworn record of 13 May 1952 confirms G. D. Thirani for Bargarh. The ECI constituency summary and TCPD winner flag incorrectly select Brajamohan Pradhan (22,159 votes) below two independent candidates. Retain all vote counts and use the confirmed elected member, whose lead is 4,784 votes."
+  },
+  "2019-vellore-nota": {
+    "year": 2019,
+    "state": "Tamil_Nadu",
+    "constituency": "VELLORE",
+    "party": "NOTA",
+    "candidate": "NOTA",
+    "votes": 9417,
+    "source": "https://www.eci.gov.in/statistical-report/ge/2019/1551",
+    "reportCopy": "https://devgatha.in/en/wp-content/uploads/2025/07/constituency-wise-detailed-result-2019.pdf",
+    "page": 396,
+    "note": "ECI's 33. Constituency Wise Detailed Result: Vellore NOTA has 9,398 general votes and 19 postal votes, total 9,417. The TCPD/OpenCity snapshot omits this row; its 1,016,638 candidate-vote sum becomes 1,026,055 including NOTA."
+  }
+}

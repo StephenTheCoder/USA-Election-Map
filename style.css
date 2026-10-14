@@ -952,3 +952,21 @@ body {
     }
   }
 }
+.india-region-note, .india-comparison-note {
+  font-size: 14px;
+  color: gray;
+}
+.india-comparison-note {
+  display: block;
+}
+.india-scrollable-regionbox #regionbox {
+  max-height: calc(100vh - 64px);
+  max-width: calc(100vw - 32px);
+  overflow: auto;
+}
+#mapViewLabel {
+  color: #eee;
+  padding: 4px 12px;
+  font-size: 18px;
+  font-family: 'Bree5erif-Mono';
+}

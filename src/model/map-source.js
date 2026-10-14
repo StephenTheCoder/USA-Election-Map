@@ -136,7 +136,7 @@ class MapSource
       {
         for (let date in filterMapDataCallback.candidateNameData)
         {
-          this.candidateNameData[date] = mergeObject(this.candidateNameData[date], filterMapDataCallback.candidateNameData[date])
+          this.candidateNameData[date] = mergeObject(this.candidateNameData[date] ?? {}, filterMapDataCallback.candidateNameData[date] ?? {})
         }
       }
       else
@@ -411,7 +411,11 @@ class MapSource
   async canZoom(mapDateData, regionID)
   {
     let baseRegionID = regionID ? getBaseRegionID(regionID).baseID : null
-    if (baseRegionID && baseRegionID.includes("-"))
+    if (this.getZoomRegion)
+    {
+      baseRegionID = this.getZoomRegion(baseRegionID, mapDateData)
+    }
+    else if (baseRegionID && baseRegionID.includes("-"))
     {
       baseRegionID = baseRegionID.split("-")[0]
     }

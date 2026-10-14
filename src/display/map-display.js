@@ -396,10 +396,11 @@ async function handleSVGZooming(resolve, svgPath, handleNewSVG, fadeForNewSVG, z
     let stateToShow = svgPath[1]
     if (stateToShow != null)
     {
+      const selectedIDs = typeof stateToShow == "object" ? new Set(stateToShow.regionIDs) : null
       for (let districtPath of $("#mapcontainertmp #outlines")[0].querySelectorAll("*"))
       {
         let splitArray = districtPath.id.split(subregionSeparator)
-        if ((stateToShow != splitArray[0] && splitArray[0] != "use") || splitArray[1] == "button")
+        if (selectedIDs ? !selectedIDs.has(districtPath.id) : (stateToShow != splitArray[0] && splitArray[0] != "use") || splitArray[1] == "button")
         {
           districtPath.remove()
         }
@@ -437,7 +438,7 @@ function setOutlineDivProperties()
       if (e.altKey && altClickRegion(e.target)) return
       if (e.shiftKey && shiftClickRegion(e.target)) return
       if (e.which == 3 || e.ctrlKey) return // handled in contextmenu
-      if (currentViewingState != ViewingState.zooming || !(currentEditingState == EditingState.viewing && pannedDuringClick)) leftClickRegion(e.target)
+      if (!(currentViewingState == ViewingState.zooming || currentMapType.enableNationalZoom) || !(currentEditingState == EditingState.viewing && pannedDuringClick)) leftClickRegion(e.target)
     })
 
     outlineDiv.on('contextmenu', function(e) {
@@ -977,6 +978,11 @@ async function displayDataMap(dateIndex, reloadPartyDropdowns, fadeForNewSVG)
   }
   
   let dateToDisplay = new Date(mapDates[dateIndex-1])
+  if (svgPanZoomController)
+  {
+    svgPanZoomController.destroy()
+    svgPanZoomController = null
+  }
 
   currentDisplayDate = dateToDisplay
 
@@ -1165,6 +1171,10 @@ async function displayDataMap(dateIndex, reloadPartyDropdowns, fadeForNewSVG)
     regionData.voteWorth = currentRegionData.voteWorth
     regionData.reportingPercent = currentRegionData.reportingPercent
     regionData.totalVotes = currentRegionData.totalVotes
+    for (const key of ["name", "boundaryYear", "electionYear", "majority", "marginUnavailable", "marginException", "voteCountsUnavailable", "multiMember", "uncontested", "constituencySeats", "seatNumber"])
+    {
+      regionData[key] = currentRegionData[key]
+    }
     regionData.altData = currentRegionData.altData
 
     updateRegionFillColors(regionsToFill, regionData, false)
@@ -1195,15 +1205,17 @@ async function displayDataMap(dateIndex, reloadPartyDropdowns, fadeForNewSVG)
   
   updateShiftDropdownVisibility()
 
-  if (currentViewingState == ViewingState.zooming)
+  if (currentViewingState == ViewingState.zooming || currentMapType.enableNationalZoom)
   {
+    $("#mapZoomControls").trigger('show')
+    updateSVGViewbox($("#svgdata"))
     svgPanZoomController = svgPanZoom('#svgdata', {
       controlIconsEnabled: false,
       fit: true,
       contain: true,
       minZoom: 1,
       zoomScaleSensitivity: 0.4,
-      panEnabled: true,
+      panEnabled: !currentMapType.enableNationalZoom || currentEditingState == EditingState.viewing,
       dblClickZoomEnabled: false,
       beforePan: () => {
         if (mouseIsDown)
@@ -1213,7 +1225,7 @@ async function displayDataMap(dateIndex, reloadPartyDropdowns, fadeForNewSVG)
       },
       onZoom: (scale) => {
         document.getElementById("svgdefinitions").innerHTML = ""
-        generateFlipPatternsFromPartyMap(politicalParties, 1/scale)
+        if (!currentMapType.enableNationalZoom || currentMapType.getMapSettingValue("flipStates")) generateFlipPatternsFromPartyMap(politicalParties, 1/scale)
       }
     })
     
@@ -1225,6 +1237,13 @@ async function displayDataMap(dateIndex, reloadPartyDropdowns, fadeForNewSVG)
     {
       setTimeout(() => $('.svg-pan-zoom_viewport').css('transition', 'transform 0.1s ease'), 1)
     }
+  }
+
+  if (currentMapType.updateViewLabel) currentMapType.updateViewLabel(currentMapDataForDate)
+  else
+  {
+    $("#mapViewLabel").hide().text("")
+    $("#mapCloseButton").attr("title", "Back to full map").attr("aria-label", "Back to full map")
   }
 
   showingDataMap = true
@@ -1700,7 +1719,7 @@ async function zoomOutMap(displayMap = true)
     await updateCompareMapSources([true, true], true, false, [$("#firstCompareDataMapDateSlider").val(), $("#secondCompareDataMapDateSlider").val()])
     shouldSetCompareMapSource = true
   }
-  else if (currentMapSource.isCustom())
+  else if (currentMapSource.isCustom() && !currentMapSource.isCompare())
   {
     currentCustomMapSource.updateMapData(displayRegionDataArray, getCurrentDateOrToday(), false, currentMapSource.getCandidateNames(getCurrentDateOrToday()))
   }
@@ -1712,7 +1731,7 @@ async function zoomOutMap(displayMap = true)
     $("#editDoneDropdownContent").css("opacity", "")
   }
 
-  displayMap && displayDataMap(null, null, true)
+  if (displayMap) await displayDataMap(null, null, true)
 }
 
 function getRegionData(regionID)

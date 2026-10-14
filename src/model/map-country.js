@@ -301,11 +301,21 @@ function setMapCountries()
   )
   UKMapCountry.setCountdownTimes({})
 
+  IndiaMapCountry.setMapTypes({[IndiaLokSabhaMapType.getID()]: IndiaLokSabhaMapType})
+  IndiaMapCountry.setPoliticalPartyData(
+    IndiaPoliticalParties,
+    ["IN-BJP", "IN-INC", "IN-SP", "IN-AITC", "IN-DMK", "IN-TDP"],
+    Object.keys(IndiaPoliticalParties).filter(id => id != "IN-NOTA"),
+    []
+  )
+  IndiaMapCountry.setCountdownTimes({})
+  mapCountries[IndiaMapCountry.getID()] = IndiaMapCountry
+
   mapCountries[UKMapCountry.getID()] = UKMapCountry
   mapCountries[USAMapCountry.getID()] = USAMapCountry
   mapCountries[JJUMapCountry.getID()] = JJUMapCountry
 
-  mapCountryIDs = [USAMapCountry.getID(), UKMapCountry.getID(), JJUMapCountry.getID()]
+  mapCountryIDs = [USAMapCountry.getID(), UKMapCountry.getID(), IndiaMapCountry.getID(), JJUMapCountry.getID()]
 }
 
 let USAMapCountry = new MapCountry(
@@ -323,3 +333,4 @@ let JJUMapCountry = new MapCountry(
 )
 
 let UKMapCountry = new MapCountry("UK", "United Kingdom", "UK", "assets/uk-flag.svg")
+let IndiaMapCountry = new MapCountry("India", "India", "IN", "assets/india-flag.svg")

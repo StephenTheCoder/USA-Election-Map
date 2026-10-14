@@ -16,6 +16,18 @@ async function updateRegionBox(regionID = currentRegionID)
   let isDiscreteRegion = viewingDiscreteRegions()
 
   let regionData = regionID ? getRegionData(regionID).regionData : null
+  const indiaTooltip = currentMapCountry?.getID() == "India"
+  $("#regionboxcontainer").toggleClass("india-scrollable-regionbox", indiaTooltip)
+  if (indiaTooltip)
+  {
+    const container = document.getElementById("regionboxcontainer")
+    const key = `${currentSliderDate?.getTime()}/${regionID}`
+    if (container.dataset.scrollRegion != key)
+    {
+      document.getElementById("regionbox").scrollTop = 0
+      container.dataset.scrollRegion = key
+    }
+  }
 
   if (
     regionID == null ||
@@ -77,8 +89,9 @@ async function updateRegionBox(regionID = currentRegionID)
   
   const shouldShowVotes = !(showingCompareMap && currentMapSource.isCompare())
   let voteshareSortedData = regionData.partyVotesharePercentages ? cloneObject(regionData.partyVotesharePercentages).sort((voteData1, voteData2) => voteData2.voteshare-voteData1.voteshare) : []
-  let roundedMarginValue = shouldShowVotes && shiftKeyDown && voteshareSortedData.length >= 2 && voteshareSortedData.every(voteData => voteData.votes != null)
-  ? addCommaFormatting(voteshareSortedData[0].votes-voteshareSortedData[1].votes)
+  let marginCandidates = voteshareSortedData.filter(v => !v.nonElectable)
+  let roundedMarginValue = shouldShowVotes && shiftKeyDown && marginCandidates.length >= 2 && marginCandidates.every(voteData => voteData.votes != null)
+  ? addCommaFormatting(regionData.majority ?? (marginCandidates[0].votes-marginCandidates[1].votes))
   : getRoundedMarginValue(regionData.margin, regionData)
   
   let regionMarginString = getRegionCandidateName(regionData.partyID, regionData) + " " + currentMapSource.getVotesharePrefix(regionData)
@@ -130,6 +143,10 @@ async function updateRegionBox(regionID = currentRegionID)
   // }
 
   regionMarginString += roundedMarginValue + (currentMapSource.getCustomVoteshareSuffix(regionData) ?? "")
+  if (regionData.marginUnavailable && currentEditingState == EditingState.viewing)
+  {
+    regionMarginString = getRegionCandidateName(regionData.partyID, regionData) + " elected"
+  }
 
   let regionBoxHTML = (currentEditingState == EditingState.viewing || (isDiscreteRegion && currentMapSource.getEditingMode() == EditingMode.margin)) ? regionMarginString : ""
   
@@ -186,7 +203,7 @@ async function updateRegionBox(regionID = currentRegionID)
   {
     regionBoxHTML += "<span style='font-size: 17px; padding-top: 8px; padding-bottom: 1px; display: block; line-height: 100%;'>Probability<br></span>"
 
-    let sortedPercentages = regionData.partyVotesharePercentages.sort((voteData1, voteData2) => voteData2.winPercentage-voteData1.winPercentage)
+    let sortedPercentages = regionData.partyVotesharePercentages.slice().sort((voteData1, voteData2) => voteData2.winPercentage-voteData1.winPercentage)
     let filteredSortedPercentages = []
     for (let voteData of sortedPercentages)
     {
@@ -222,13 +239,13 @@ async function updateRegionBox(regionID = currentRegionID)
     let sortedPercentages
     if (regionData.partyVotesharePercentages?.[0]?.order != null)
     {
-      sortedPercentages = regionData.partyVotesharePercentages.sort((voteData1, voteData2) => {
+      sortedPercentages = regionData.partyVotesharePercentages.slice().sort((voteData1, voteData2) => {
         return voteData1.order - voteData2.order
       })
     }
     else
     {
-      sortedPercentages = regionData.partyVotesharePercentages.sort((voteData1, voteData2) => {
+      sortedPercentages = regionData.partyVotesharePercentages.slice().sort((voteData1, voteData2) => {
         return voteData2.voteshare - voteData1.voteshare
       })
     }
@@ -367,6 +384,19 @@ function updateRegionBoxPosition(mouseX, mouseY)
   $("#regionboxcontainer").css("left", newRegionBoxXPos)
   updateRegionBoxYPosition(mouseY)
 }
+
+// Keep the shared hover/click-to-zoom interaction while allowing long Indian
+// candidate lists to be read with the wheel, including the 480-candidate 1996 poll.
+document.addEventListener("wheel", event => {
+  if (currentMapCountry?.getID() != "India" || event.ctrlKey) return
+  const container = document.getElementById("regionboxcontainer")
+  const box = document.getElementById("regionbox")
+  if (!box || getComputedStyle(container).display == "none" || box.scrollHeight <= box.clientHeight+1) return
+  const scale = event.deltaMode == 1 ? 24 : event.deltaMode == 2 ? box.clientHeight : 1
+  box.scrollTop += event.deltaY*scale
+  event.preventDefault()
+  event.stopPropagation()
+}, {passive: false, capture: true})
 
 function updateRegionBoxYPosition(mouseY)
 {
@@ -521,11 +551,20 @@ function applyRegionVotesharePercentage(textBoxDiv, regionID)
   {
     currentVoteshareData.voteshare = newVoteshare
 
-    let partyVotesharePercentages = regionData.partyVotesharePercentages.concat()
+    let partyVotesharePercentages = regionData.partyVotesharePercentages.filter(v => !v.nonElectable)
     partyVotesharePercentages.sort((voteshareData1, voteshareData2) => voteshareData2.voteshare-voteshareData1.voteshare)
-    regionData.margin = partyVotesharePercentages.length < 2 ? partyVotesharePercentages[0].voteshare : partyVotesharePercentages[0].voteshare-partyVotesharePercentages[1].voteshare
+    regionData.margin = (partyVotesharePercentages[0]?.voteshare ?? 0)-(partyVotesharePercentages[1]?.voteshare ?? 0)
     regionData.partyID = partyVotesharePercentages.some(voteshareData => voteshareData.voteshare != 0) ? partyVotesharePercentages[0].partyID : TossupParty.getID()
     regionData.candidateName = regionData.partyID == TossupParty.getID() ? null : partyVotesharePercentages[0].candidate
+    if (regionData.marginUnavailable != null)
+    {
+      regionData.marginUnavailable = false
+      regionData.multiMember = false
+      regionData.uncontested = false
+      regionData.marginException = false
+      regionData.voteCountsUnavailable = false
+      delete regionData.majority
+    }
 
     $(textBoxDiv).parent().parent().css("background", getGradientCSS(politicalParties[currentVoteshareData.partyID].getMarginColors().safe, politicalParties[currentVoteshareData.partyID].getMarginColors().lean, currentVoteshareData.voteshare))
 

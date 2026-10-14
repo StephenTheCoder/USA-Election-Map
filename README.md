@@ -7,6 +7,7 @@ An interactive USA presidential, senate, house, and governor election map. Creat
 * Interactive and detailed map sources
   * Past results for presidential (1788-2024, counties for 1892-2024), senatorial (1960-2024), house (1976-2024), and gubernatorial (1980-2024) elections, with victory margin and voteshare breakdowns for each state & district
   * UK general election results for every election from 1997 to 2024, accessible through the flag selector, with historical constituency boundaries, seat totals and vote breakdowns. See [UK data sources and methodology](csv-sources/UK-DATA.md).
+  * All 18 Indian Lok Sabha elections from 1951–52 to 2024, through the India flag: state-grouped seat tiles for 1951–1971, constituency outlines thereafter, zoom/pan, click-through state views, candidate votes, MP totals, comparisons, editable copies and CSV/JSON import/export. See [India data sources and methodology](csv-sources/INDIA-DATA.md).
   * Pie chart for electoral vote counts by party and margin, national popular vote totals for past elections
   * Flip states and counties between election cycles
   * Fully editable custom maps that can be downloaded and uploaded as JSON or CSV files
@@ -27,6 +28,27 @@ cd USA-Election-Map
 http-server
 ```
 Then, open the address provided in the Terminal window (by default, it seems to be http://localhost:8080).
+
+## GitHub Pages deployment
+
+Before the first deployment of a fork, open the repository's **Settings > Pages**.
+Under **Build and deployment**, set **Source** to **GitHub Actions**. The existing
+`.github/workflows/pages.yml` publishes the default branch; you do not need to
+create another workflow. See [GitHub's publishing-source setup instructions](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-with-a-custom-github-actions-workflow).
+
+Then open **Actions > Deploy to Pages** and run the workflow on the default branch,
+or rerun the failed deployment. Subsequent pushes to the default branch deploy
+automatically.
+
+If **Setup Pages** reports `Get Pages site failed` with HTTP 404, check the Pages
+source setting above. Creating a `github-pages` environment or granting
+`pages: write` to the workflow does not enable the Pages site. The action's
+`enablement: true` option requires a separate token with the appropriate Pages
+permissions; it cannot use the default `GITHUB_TOKEN` for initial enablement.
+See the [configure-pages input documentation](https://github.com/actions/configure-pages/blob/v6/action.yml).
+
+The deployment uses `ubuntu-24.04` to keep the runner version stable during the
+`ubuntu-latest` migration. That migration notice is separate from the Pages 404.
 
 ## TODO List
 

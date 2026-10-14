@@ -38,6 +38,7 @@ const elections=JSON.parse(fs.readFileSync('csv-sources/uk-general-elections.jso
  await page.locator('#mapZoomInButton').click();
  assert.ok(await page.evaluate(()=>svgPanZoomController.getZoom()>1));
  await page.locator('#mapCloseButton').click();await page.waitForFunction(()=>currentViewingState===ViewingState.viewing);
+ await page.locator('#cycleMapCountryButton').click();await page.waitForFunction(()=>currentMapCountry.getID()==='India'&&currentMapType.getID()==='India-LokSabha'&&currentSliderDate?.getFullYear()===2024&&!isRunningDisplayMapQueue&&loaderStack[0]===LoaderType.hidden);
  await page.locator('#cycleMapCountryButton').click();await page.waitForFunction(()=>currentMapCountry.getID()==='JJU'&&currentMapType.getID()==='JJU-House');
  await page.locator('#cycleMapCountryButton').click();await page.waitForFunction(()=>currentMapCountry.getID()==='USA'&&currentMapType.getID().startsWith('USA')&&document.querySelector('[aria-label="Switch to United Kingdom"]'));
  await page.locator('#cycleMapCountryButton').hover();await page.locator('[aria-label="Switch to United Kingdom"]').click();

@@ -31,6 +31,7 @@
     <script src="./src/model/map-types/jju-president-map-type.js"></script>
     <script src="./src/model/map-types/jju-governor-map-type.js"></script>
     <script src="./src/model/map-types/uk-commons-map-type.js"></script>
+    <script src="./src/model/map-types/india-lok-sabha-map-type.js"></script>
     <script src="./src/display/modals/user-maps-modal.js"></script>
     <script src="./src/display/dropdowns/profile-dropdown.js"></script>
     <script src="./src/display/dropdowns/map-country-dropdown.js"></script>
@@ -405,6 +406,7 @@
     <input type='file' id='uploadFileInput' style='display: none'>
     <div id='maincontent'>
       <div id='maptextcontainer'>
+        <div id="mapViewLabel" aria-live="polite" style="display: none;"></div>
         <div style="display: flex; height: 0; flex-grow: 1; margin-top: 15rem; margin-bottom: 15rem; gap: 10rem;">
           <div id="mapRoundControls" style="display: none; width: 55rem; flex-direction: column; margin-top: 15rem; margin-bottom: 15rem;"></div>
           <div id="mapcontainer" style="overflow: hidden; display: flex; flex-grow: 1;" oncontextmenu="return false"></div>

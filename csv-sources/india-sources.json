@@ -1,0 +1,90 @@
+{
+  "retrieved": "2026-10-13",
+  "inputs": {
+    "TCPD_IED_1951-62.csv": {
+      "url": "https://raw.githubusercontent.com/tcpd/IndianElectionsDataset_1951-to-1962/HEAD/TCPD_IED_1951-62.csv",
+      "sha256": "9891c366e5850ee562efea9fa123c9b955222ad73a520dcd91a0b83acb50b6bb"
+    },
+    "2019-official.csv": {
+      "url": "https://data.opencity.in/dataset/1874a140-a8c4-4d5d-80cd-cbbd400c21e5/resource/ed40f56f-3d97-41a4-8b5d-14b204b6f320/download/81842470-a23e-4785-a22b-ba81284101de.csv",
+      "sha256": "a3dbeb280776ac6a59cb0228588119c0721d3e429c924e067da3865006228999"
+    },
+    "2024.csv": {
+      "url": "https://raw.githubusercontent.com/thecont1/india-votes-data/HEAD/archive/2024%20Parliamentary%20Elections%20India.csv",
+      "sha256": "f2ce269e912b2f52da204a469492d95267336831ade4f908469369ccf321e439"
+    },
+    "ge_party_statistics.csv": {
+      "url": "https://raw.githubusercontent.com/tcpd/tcpd-ld-data-archive/HEAD/ld_files_db/GE/derived/lokdhaba/ge_party_statistics.csv",
+      "sha256": "8e557b7da0896fe050d72e9dc87602f40211c84e440f34b1555c99843f21cb34"
+    },
+    "pre2008.shp": {
+      "url": "https://raw.githubusercontent.com/skthewimp/india-constituency-maps/HEAD/pre2008/parliamentary/india_parliamentary.shp",
+      "sha256": "adcd6f9a1ed7f5ffbd5c136749d80d5081efefe12f923e7e474add2489327321"
+    },
+    "pre2008.shx": {
+      "url": "https://raw.githubusercontent.com/skthewimp/india-constituency-maps/HEAD/pre2008/parliamentary/india_parliamentary.shx",
+      "sha256": "e98921d5e76571e9175ae5ac37221328655aa5e99a1598d8432e5307a64ba605"
+    },
+    "pre2008.dbf": {
+      "url": "https://raw.githubusercontent.com/skthewimp/india-constituency-maps/HEAD/pre2008/parliamentary/india_parliamentary.dbf",
+      "sha256": "bc8f3a53615655077f472bc909f007b5944cf1e89bcba37b2ffe392bcfa9963f"
+    },
+    "pre2008.prj": {
+      "url": "https://raw.githubusercontent.com/skthewimp/india-constituency-maps/HEAD/pre2008/parliamentary/india_parliamentary.prj",
+      "sha256": "a02a27b1d1982c8516d83398e85a3c8b1aef1713c13ef4d84d7bde17430c07c4"
+    },
+    "post2008.shp": {
+      "url": "https://raw.githubusercontent.com/skthewimp/india-constituency-maps/HEAD/post2008/parliamentary/india_parliamentary.shp",
+      "sha256": "89fcfe904e3adc7eb0246f660504440e57c9155ade14a53bd57c20d8a7332120"
+    },
+    "post2008.shx": {
+      "url": "https://raw.githubusercontent.com/skthewimp/india-constituency-maps/HEAD/post2008/parliamentary/india_parliamentary.shx",
+      "sha256": "d1c1055c640ab1ff30b7da125554b20734deb44b57c21b6173ee026697d2c862"
+    },
+    "post2008.dbf": {
+      "url": "https://raw.githubusercontent.com/skthewimp/india-constituency-maps/HEAD/post2008/parliamentary/india_parliamentary.dbf",
+      "sha256": "fc13c03579b05106e2b5e2067065e85fcdcca32bd69658804fc5694f6d98e451"
+    },
+    "post2008.prj": {
+      "url": "https://raw.githubusercontent.com/skthewimp/india-constituency-maps/HEAD/post2008/parliamentary/india_parliamentary.prj",
+      "sha256": "a02a27b1d1982c8516d83398e85a3c8b1aef1713c13ef4d84d7bde17430c07c4"
+    },
+    "assam.geojson": {
+      "url": "https://raw.githubusercontent.com/skthewimp/india-constituency-maps/HEAD/redelimited/source/assam_ls_new_borders.geojson",
+      "sha256": "05b606bafd9c7575418bcbfc19c8b41837c498ee57d866c9fdc95ffdd167ace8"
+    },
+    "j_and_k.geojson": {
+      "url": "https://raw.githubusercontent.com/skthewimp/india-constituency-maps/HEAD/redelimited/source/j_and_k_ls_new_borders.geojson",
+      "sha256": "23f43317c322ba0c44976cffc138d17cc33f31d37586a5b5a32db5894dc431a1"
+    },
+    "ladakh.geojson": {
+      "url": "https://raw.githubusercontent.com/skthewimp/india-constituency-maps/HEAD/redelimited/source/ladakh_ls_new_borders.geojson",
+      "sha256": "0bfc151be017cd007131cc28a4462a328d5f82e2083485f60a905da1797bd13b"
+    }
+  },
+  "corrections": {
+    "1952-bargarh-winner": {
+      "year": 1952,
+      "state": "Orissa",
+      "constituency": "BARGARH",
+      "party": "IND",
+      "candidate": "GHANSHYAM DAS THIRANI",
+      "votes": 27461,
+      "winner": true,
+      "source": "https://eparlib.sansad.in/bitstream/123456789/894287/1/01_I_13-05-1952_p13_p21_PII.pdf",
+      "note": "The Lok Sabha's Members Sworn record of 13 May 1952 confirms G. D. Thirani for Bargarh. The ECI constituency summary and TCPD winner flag incorrectly select Brajamohan Pradhan (22,159 votes) below two independent candidates. Retain all vote counts and use the confirmed elected member, whose lead is 4,784 votes."
+    },
+    "2019-vellore-nota": {
+      "year": 2019,
+      "state": "Tamil_Nadu",
+      "constituency": "VELLORE",
+      "party": "NOTA",
+      "candidate": "NOTA",
+      "votes": 9417,
+      "source": "https://www.eci.gov.in/statistical-report/ge/2019/1551",
+      "reportCopy": "https://devgatha.in/en/wp-content/uploads/2025/07/constituency-wise-detailed-result-2019.pdf",
+      "page": 396,
+      "note": "ECI's 33. Constituency Wise Detailed Result: Vellore NOTA has 9,398 general votes and 19 postal votes, total 9,417. The TCPD/OpenCity snapshot omits this row; its 1,016,638 candidate-vote sum becomes 1,026,055 including NOTA."
+    }
+  }
+}
